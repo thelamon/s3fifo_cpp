@@ -109,17 +109,18 @@ namespace cache {
             return _ghost_fifo.size() >= _main_fifo_size;
         }
 
-        void InsertG(const Key &key, TableNode &node) {
+        void InsertG(TableNodePtr node_ptr) {
             if (GhostIsFull()) {
-                const auto item = _ghost_fifo.pop_back();
-                if (item.freq < 0) {
-                    RemoveItem(item.key);
+                const auto item_ptr = _ghost_fifo.back();
+                _ghost_fifo.pop_back();
+                if (item_ptr->freq < 0) {
+                    RemoveItem(item_ptr->key);
                 }
             }
 
             // node.value == nullptr ?
-            node.freq = -1;
-            _ghost_fifo.push_front(DequeItem(key, -1));
+            node_ptr->freq = -1;
+            _ghost_fifo.push_front(node_ptr);
         }
 
         void EnsureFree() {
